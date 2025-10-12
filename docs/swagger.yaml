@@ -1,0 +1,169 @@
+basePath: /
+definitions:
+  models.Todo:
+    properties:
+      completed:
+        type: boolean
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
+  models.TodoRequest:
+    properties:
+      completed:
+        type: boolean
+      description:
+        type: string
+      title:
+        type: string
+    type: object
+host: localhost:8081
+info:
+  contact: {}
+  description: REST API for working with todo's
+  title: ToDo App API
+  version: "1.0"
+paths:
+  /todos:
+    get:
+      description: Get list of all todos
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Todo'
+            type: array
+      summary: Get all todos
+      tags:
+      - todos
+    post:
+      consumes:
+      - application/json
+      description: Create a new todo item
+      parameters:
+      - description: Todo data
+        in: body
+        name: todo
+        required: true
+        schema:
+          $ref: '#/definitions/models.TodoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Todo'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create todo
+      tags:
+      - todos
+  /todos/{id}:
+    delete:
+      description: Delete todo item by ID
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete todo
+      tags:
+      - todos
+    get:
+      description: Get todo item by ID
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Todo'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get todo by ID
+      tags:
+      - todos
+    put:
+      consumes:
+      - application/json
+      description: Update todo item
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Todo data
+        in: body
+        name: todo
+        required: true
+        schema:
+          $ref: '#/definitions/models.TodoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Todo'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update todo
+      tags:
+      - todos
+swagger: "2.0"
