@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/qsheker/ToDo-app/internal/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -33,5 +34,7 @@ func NewDB(cfg Config) (*gorm.DB, error) {
 }
 
 func AutoMigrate(db *gorm.DB) error {
-	return db.AutoMigrate()
+	return db.AutoMigrate(
+		&models.User{},
+		&models.Todo{})
 }
