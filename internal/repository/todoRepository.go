@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"github.com/google/uuid"
 	"github.com/qsheker/ToDo-app/internal/models"
 	"gorm.io/gorm"
 )
@@ -26,7 +27,7 @@ func (repo *gormTodoRepo) GetAll() ([]models.Todo, error) {
 	err := repo.db.Preload("User").Order("created_at DESC").Find(&todos).Error
 	return todos, err
 }
-func (repo *gormTodoRepo) GetByUserID(userID int64) ([]models.Todo, error) {
+func (repo *gormTodoRepo) GetByUserID(userID uuid.UUID) ([]models.Todo, error) {
 	var todos []models.Todo
 	err := repo.db.Where("user_id = ?", userID).Order("created_at DESC").Find(&todos).Error
 	return todos, err

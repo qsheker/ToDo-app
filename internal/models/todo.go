@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -15,13 +16,13 @@ type Todo struct {
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `json:"-" gorm:"index"`
 
-	UserID int64 `json:"user_id" gorm:"not null;index"`
-	User   User  `json:"user,omitempty" gorm:"foreignKey:UserID"`
+	UserID uuid.UUID `json:"user_id" gorm:"type:uuid;not null;index"`
+	User   User      `json:"user,omitempty" gorm:"foreignKey:UserID"`
 }
 
 type TodoRequest struct {
-	Title       string `json:"title" validate:"required"`
-	Description string `json:"description,omitempty"`
-	Completed   bool   `json:"completed"`
-	UserID      int64  `json:"user_id,omitempty"`
+	Title       string    `json:"title" validate:"required"`
+	Description string    `json:"description,omitempty"`
+	Completed   bool      `json:"completed"`
+	UserID      uuid.UUID `json:"user_id,omitempty"`
 }
