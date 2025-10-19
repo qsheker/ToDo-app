@@ -7,10 +7,10 @@ import (
 
 type TodoRepository interface {
 	Create(todo *models.Todo) error
-	GetByID(id int64) (*models.Todo, error)
-	GetAll() ([]models.Todo, error)
-	GetByUserID(userID uuid.UUID) ([]models.Todo, error)
-	Update(todo *models.Todo) error
+	GetByID(id int64) (*models.TodoResponse, error)
+	GetAll() ([]models.TodoResponse, error)
+	GetByUserID(userID uuid.UUID) ([]models.TodoResponse, error)
+	Update(todo *models.TodoResponse) error
 	Delete(id int64) error
 	ToggleComplete(id int64) error
 }

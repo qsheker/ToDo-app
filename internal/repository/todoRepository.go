@@ -22,13 +22,13 @@ func (repo *gormTodoRepo) GetByID(id int64) (*models.Todo, error) {
 	err := repo.db.Preload("User").First(&todo, id).Error
 	return &todo, err
 }
-func (repo *gormTodoRepo) GetAll() ([]models.Todo, error) {
-	var todos []models.Todo
+func (repo *gormTodoRepo) GetAll() ([]models.TodoResponse, error) {
+	var todos []models.TodoResponse
 	err := repo.db.Preload("User").Order("created_at DESC").Find(&todos).Error
 	return todos, err
 }
-func (repo *gormTodoRepo) GetByUserID(userID uuid.UUID) ([]models.Todo, error) {
-	var todos []models.Todo
+func (repo *gormTodoRepo) GetByUserID(userID uuid.UUID) ([]models.TodoResponse, error) {
+	var todos []models.TodoResponse
 	err := repo.db.Where("user_id = ?", userID).Order("created_at DESC").Find(&todos).Error
 	return todos, err
 }

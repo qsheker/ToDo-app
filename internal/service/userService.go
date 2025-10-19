@@ -1,7 +1,6 @@
 package service
 
 import (
-	"errors"
 	"time"
 
 	"github.com/google/uuid"
@@ -14,9 +13,8 @@ type UserService interface {
 	Create(user *models.CreateUserRequest) error
 	GetByID(id uuid.UUID) (*models.UserResponse, error)
 	GetByUsername(username string) (*models.UserResponse, error)
-	Update(user *models.User) error
+	Update(user *models.UpdateUserRequest) error
 	Delete(id uuid.UUID) error
-	ValidatePassword(user *models.User, password string) error
 	hashPassword(password string) (string, error)
 }
 
@@ -70,19 +68,26 @@ func (s *UserServiceImpl) GetByUsername(username string) (*models.UserResponse, 
 	}
 	return userResponse, nil
 }
-func (s *UserServiceImpl) Update(user *models.User) error {
-	user.UpdatedAt = time.Now()
-	return s.repo.Update(user)
+func (s *UserServiceImpl) Update(user *models.UpdateUserRequest) error {
+	hashed, err := s.hashPassword(user.Password)
+	if err != nil {
+		return err
+	}
+	entity := &models.User{
+		ID:        user.ID,
+		Name:      user.Name,
+		Username:  user.Username,
+		Password:  hashed,
+		UpdatedAt: time.Now(),
+	}
+	if err := s.repo.Update(entity); err != nil {
+		return err
+	}
+	return nil
+
 }
 func (s *UserServiceImpl) Delete(id uuid.UUID) error {
 	return s.repo.Delete(id)
-}
-func (s *UserServiceImpl) ValidatePassword(user *models.User, password string) error {
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
-	if err != nil {
-		return errors.New("invalid password")
-	}
-	return nil
 }
 func (s *UserServiceImpl) hashPassword(password string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)

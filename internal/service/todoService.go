@@ -5,18 +5,19 @@ import (
 	"log"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/qsheker/ToDo-app/internal/models"
 	"github.com/qsheker/ToDo-app/internal/repository"
 )
 
 type TodoService interface {
-	CreateTodo(req *models.TodoRequest) (*models.Todo, error)
-	GetTodoByID(id int64) (*models.Todo, error)
-	GetAllTodos() ([]models.Todo, error)
-	GetTodosByUserID(userID int64) ([]models.Todo, error)
-	UpdateTodo(id int64, req *models.TodoRequest) (*models.Todo, error)
+	CreateTodo(req *models.TodoRequest) (*models.TodoResponse, error)
+	GetTodoByID(id int64) (*models.TodoResponse, error)
+	GetAllTodos() ([]models.TodoResponse, error)
+	GetTodosByUserID(userID uuid.UUID) ([]models.TodoResponse, error)
+	UpdateTodo(id int64, req *models.TodoRequest) (*models.TodoResponse, error)
 	DeleteTodo(id int64) error
-	ToggleComplete(id int64) (*models.Todo, error)
+	ToggleComplete(id int64) (*models.TodoResponse, error)
 }
 
 type TodoServiceImpl struct {
@@ -26,7 +27,7 @@ type TodoServiceImpl struct {
 func NewTodoService(repo repository.TodoRepository) TodoService {
 	return &TodoServiceImpl{repo: repo}
 }
-func (s *TodoServiceImpl) CreateTodo(req *models.TodoRequest) (*models.Todo, error) {
+func (s *TodoServiceImpl) CreateTodo(req *models.TodoRequest) (*models.TodoResponse, error) {
 	if req.Title == "" {
 		return nil, errors.New("title is required")
 	}
@@ -34,31 +35,40 @@ func (s *TodoServiceImpl) CreateTodo(req *models.TodoRequest) (*models.Todo, err
 		Title:       req.Title,
 		Description: req.Description,
 		Completed:   req.Completed,
+		UserID:      req.UserID,
 	}
 	if err := s.repo.Create(todo); err != nil {
 		log.Println("Error creating a todo: ", err)
 		return nil, err
 	}
-	return todo, nil
+	return &models.TodoResponse{
+		ID:          todo.ID,
+		Title:       todo.Title,
+		Description: todo.Description,
+		Completed:   todo.Completed,
+		CreatedAt:   todo.CreatedAt,
+		UpdatedAt:   todo.UpdatedAt,
+		UserID:      todo.UserID,
+	}, nil
 }
-func (s *TodoServiceImpl) GetTodoByID(id int64) (*models.Todo, error) {
+func (s *TodoServiceImpl) GetTodoByID(id int64) (*models.TodoResponse, error) {
 	todo, err := s.repo.GetByID(id)
 	if err != nil {
 		return nil, err
 	}
 	return todo, nil
 }
-func (s *TodoServiceImpl) GetAllTodos() ([]models.Todo, error) {
+func (s *TodoServiceImpl) GetAllTodos() ([]models.TodoResponse, error) {
 	return s.repo.GetAll()
 }
-func (s *TodoServiceImpl) GetTodosByUserID(userID int64) ([]models.Todo, error) {
+func (s *TodoServiceImpl) GetTodosByUserID(userID uuid.UUID) ([]models.TodoResponse, error) {
 	todo, err := s.repo.GetByUserID(userID)
 	if err != nil {
 		return nil, err
 	}
 	return todo, nil
 }
-func (s *TodoServiceImpl) UpdateTodo(id int64, req *models.TodoRequest) (*models.Todo, error) {
+func (s *TodoServiceImpl) UpdateTodo(id int64, req *models.TodoRequest) (*models.TodoResponse, error) {
 	todo, err := s.repo.GetByID(id)
 	if err != nil {
 		return nil, err
@@ -75,7 +85,7 @@ func (s *TodoServiceImpl) UpdateTodo(id int64, req *models.TodoRequest) (*models
 func (s *TodoServiceImpl) DeleteTodo(id int64) error {
 	return s.repo.Delete(id)
 }
-func (s *TodoServiceImpl) ToggleComplete(id int64) (*models.Todo, error) {
+func (s *TodoServiceImpl) ToggleComplete(id int64) (*models.TodoResponse, error) {
 	if err := s.repo.ToggleComplete(id); err != nil {
 		return nil, err
 	}

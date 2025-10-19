@@ -10,8 +10,8 @@ type gormUserRepo struct {
 	db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) TodoRepository {
-	return &gormTodoRepo{db: db}
+func NewUserRepository(db *gorm.DB) UserRepository {
+	return &gormUserRepo{db: db}
 }
 
 func (repo *gormUserRepo) Create(user *models.User) error {

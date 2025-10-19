@@ -8,7 +8,7 @@ import (
 )
 
 type User struct {
-	ID        uuid.UUID      `json:"id" gorm:"type:uuid,primaryKey"`
+	ID        uuid.UUID      `json:"id" gorm:"type:uuid;primaryKey"`
 	Name      string         `json:"name" gorm:"type:varchar(255);not null"`
 	Username  string         `json:"username" gorm:"type:varchar(255);uniqueIndex;not null"`
 	Password  string         `json:"-" gorm:"type:varchar(255);not null"`
@@ -29,4 +29,11 @@ type UserResponse struct {
 	ID       uuid.UUID `json:"id"`
 	Name     string    `json:"name"`
 	Username string    `json:"username"`
+}
+
+type UpdateUserRequest struct {
+	ID       uuid.UUID `json:"id"`
+	Name     string    `json:"name"`
+	Username string    `json:"username"`
+	Password string    `json:"password" validate:"min=6"`
 }
