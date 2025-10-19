@@ -1,10 +1,12 @@
 package main
 
 import (
-	"log"
-
+	"github.com/gin-gonic/gin"
+	_ "github.com/qsheker/ToDo-app/docs"
+	"github.com/qsheker/ToDo-app/internal/handlers"
 	"github.com/qsheker/ToDo-app/internal/repository"
-	"github.com/spf13/viper"
+	"github.com/qsheker/ToDo-app/internal/routes"
+	"github.com/qsheker/ToDo-app/internal/service"
 )
 
 // @title ToDo App API
@@ -14,32 +16,19 @@ import (
 // @host localhost:8081
 // @BasePath /
 func main() {
-	if err := initConfig(); err != nil {
-		log.Fatal(err.Error())
-	}
-	//port := viper.GetString("app.port")
+	r := gin.Default()
+	injector := repository.Injector()
 
-	// GORM connection
-	db, err := repository.NewDB(repository.Config{
-		Host:     viper.GetString("database.host"),
-		Port:     viper.GetString("database.port"),
-		Username: viper.GetString("database.username"),
-		Password: viper.GetString("database.password"),
-		DBName:   viper.GetString("database.dbname"),
-		SSLMode:  viper.GetString("database.sslmode"),
-	})
-	if err != nil {
-		log.Fatal("Database connection failed:", err)
-	}
+	todoRepo := repository.NewTodoRepository(injector)
+	userRepo := repository.NewUserRepository(injector)
 
-	if err := repository.AutoMigrate(db); err != nil {
-		log.Fatal("Migration failed:", err)
-	}
+	todoService := service.NewTodoService(todoRepo)
+	userService := service.NewUserService(userRepo)
 
-}
-func initConfig() error {
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath("configs")
-	return viper.ReadInConfig()
+	todoHandler := handlers.NewTodoHandler(todoService)
+	userHandler := handlers.NewUserHandler(userService)
+
+	routes.RegisterRoutes(r, todoHandler, userHandler)
+
+	r.Run("localhost:8081")
 }
