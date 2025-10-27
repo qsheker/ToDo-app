@@ -24,11 +24,13 @@ func main() {
 
 	todoService := service.NewTodoService(todoRepo)
 	userService := service.NewUserService(userRepo)
+	jwtService := service.NewJwtService(userRepo)
 
+	authHandler := handlers.NewAuthHandler(userService, jwtService)
 	todoHandler := handlers.NewTodoHandler(todoService)
 	userHandler := handlers.NewUserHandler(userService)
 
-	routes.RegisterRoutes(r, todoHandler, userHandler)
+	routes.RegisterRoutes(r, todoHandler, userHandler, authHandler)
 
 	r.Run("localhost:8081")
 }

@@ -7,7 +7,16 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func RegisterRoutes(r *gin.Engine, todoHandler *handlers.TodoHandler, userHandler *handlers.UserHandler) {
+func RegisterRoutes(r *gin.Engine, todoHandler *handlers.TodoHandler, userHandler *handlers.UserHandler, authHandler *handlers.AuthHandler) {
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	authRoutes := r.Group("/auth")
+	{
+		authRoutes.POST("/sign-up", authHandler.SignUp)
+		authRoutes.POST("/sign-in", authHandler.SignIn)
+	}
+
 	todoRoutes := r.Group("/todos")
 	{
 		todoRoutes.POST("/", todoHandler.CreateTodo)
@@ -27,5 +36,4 @@ func RegisterRoutes(r *gin.Engine, todoHandler *handlers.TodoHandler, userHandle
 		userRoutes.PUT("/", userHandler.Update)
 		userRoutes.DELETE("/:id", userHandler.Delete)
 	}
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 }

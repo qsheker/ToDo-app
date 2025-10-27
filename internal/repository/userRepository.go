@@ -33,3 +33,9 @@ func (repo *gormUserRepo) Update(user *models.User) error {
 func (repo *gormUserRepo) Delete(id uuid.UUID) error {
 	return repo.db.Delete(&models.User{}, id).Error
 }
+func (repo *gormUserRepo) GetUser(username, password string) (models.User, error) {
+	var user models.User
+	err := repo.db.Raw("SELECT * FROM users WHERE username = ? AND password = ?", username, password).
+		Scan(&user).Error
+	return user, err
+}
